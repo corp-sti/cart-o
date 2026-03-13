@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- QR Code Generator (QRCode.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -56,6 +58,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            z-index: 1;
         }
 
         /* HEADER com logo centralizada e MAIOR */
@@ -76,11 +79,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 320px; /* Aumentado de 260px para 320px */
-            height: 85px; /* Aumentado de 65px para 85px */
+            width: 320px;
+            height: 85px;
         }
 
-        /* Imagem da logo redimensionada proporcionalmente */
         .logo-img {
             width: 100%;
             height: 100%;
@@ -95,7 +97,7 @@
             display: none;
         }
 
-        /* conteúdo com scroll suave - MARGENS INTERNAS UNIFORMES */
+        /* conteúdo com scroll suave */
         .conteudo {
             padding: 16px 24px 20px;
             background: transparent;
@@ -435,7 +437,7 @@
             margin-top: 2px;
         }
 
-        /* rodapé */
+        /* rodapé com clique para QR Code */
         .footer-card {
             display: flex;
             justify-content: space-between;
@@ -457,6 +459,14 @@
             gap: 4px;
             border: 1px solid rgba(0,0,0,0.04);
             backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .badge-digital:active {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: #D4AF37;
+            transform: scale(0.95);
         }
 
         .badge-digital i {
@@ -474,11 +484,110 @@
             align-items: center;
             gap: 4px;
         }
+
+        /* MODAL DO QR CODE - TELA CHEIA */
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .qr-modal.active {
+            display: flex;
+        }
+
+        .qr-container {
+            background: white;
+            padding: 30px;
+            border-radius: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 320px;
+            width: 100%;
+        }
+
+        #qrcode {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        #qrcode img {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+        }
+
+        .qr-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1C1C1E;
+            text-align: center;
+        }
+
+        .qr-link {
+            font-size: 0.8rem;
+            color: #D4AF37;
+            background: #1C1C1E;
+            padding: 8px 16px;
+            border-radius: 40px;
+            word-break: break-all;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .qr-close {
+            background: #D4AF37;
+            color: #1C1C1E;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .qr-close:active {
+            transform: scale(0.95);
+            background: #c19b2e;
+        }
+
+        .qr-close i {
+            margin-right: 8px;
+        }
+
+        /* animação de entrada */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .qr-modal.active .qr-container {
+            animation: fadeIn 0.3s ease;
+        }
     </style>
 </head>
 <body>
     <div class="card-sti">
-        <!-- HEADER COM LOGO CENTRALIZADA E AINDA MAIOR -->
+        <!-- HEADER COM LOGO CENTRALIZADA E GRANDE -->
         <div class="header-logo">
             <div class="logo-container">
                 <img src="https://i.ibb.co/8wFNWHR/STI-1.png"
@@ -488,11 +597,10 @@
                      loading="lazy"
                      onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'320\' height=\'85\' viewBox=\'0 0 320 85\'%3E%3Crect width=\'320\' height=\'85\' fill=\'%23003459\' rx=\'12\'/%3E%3Ctext x=\'40\' y=\'55\' font-family=\'Arial\' font-size=\'34\' font-weight=\'bold\' fill=\'%23D4AF37\'%3ESTI%3C/text%3E%3Ctext x=\'40\' y=\'72\' font-family=\'Arial\' font-size=\'14\' fill=\'%23FFFFFF\'%3ESOLUÇÕES TÉCNICAS INTEGRADAS%3C/text%3E%3C/svg%3E'">
             </div>
-            <!-- Badge premium ocultado -->
         </div>
 
         <div class="conteudo">
-            <!-- tagline com ícone de lâmpada e saudação com ícone dinâmico -->
+            <!-- tagline com saudação dinâmica -->
             <div class="tagline-wrapper">
                 <div class="tagline-principal">
                     <i class="fas fa-lightbulb"></i> Inovação & Tecnologia
@@ -502,7 +610,7 @@
                 </div>
             </div>
 
-            <!-- serviços grid com ícones: rede, shield (segurança eletrônica), chip, raio -->
+            <!-- serviços grid -->
             <div class="servicos-grid">
                 <div class="servico-item" title="Redes estruturadas · Wi-Fi 6 · Fibra">
                     <i class="fas fa-network-wired"></i>
@@ -522,7 +630,7 @@
                 </div>
             </div>
 
-            <!-- destaques com ícones: ferramentas, sincronizar, headset -->
+            <!-- destaques -->
             <div class="destaque-servicos">
                 <div class="destaque-item">
                     <i class="fas fa-tools"></i>
@@ -538,9 +646,9 @@
                 </div>
             </div>
 
-            <!-- CONTATO COM FOCO NO WHATSAPP -->
+            <!-- CONTATO -->
             <div class="contato-wrapper">
-                <!-- BOTÃO WHATSAPP PRINCIPAL com ícone do whatsapp -->
+                <!-- WHATSAPP -->
                 <div class="whatsapp-bloco" id="btnWhatsapp" title="Falar agora no WhatsApp">
                     <i class="fab fa-whatsapp"></i>
                     <div class="whatsapp-texto">
@@ -554,7 +662,7 @@
                     </div>
                 </div>
 
-                <!-- endereço com ícone de mapa e site com ícone de globo -->
+                <!-- endereço e site -->
                 <div class="contato-secundario">
                     <div class="contato-bloco" title="Ver no mapa" onclick="window.open('https://maps.google.com/?q=Rua+Eloy+de+Assis+Fabris+452+Curitiba', '_blank')">
                         <i class="fas fa-map-pin"></i>
@@ -577,9 +685,9 @@
                 </div>
             </div>
 
-            <!-- rodapé com ícone de qrcode e relógio -->
+            <!-- rodapé com clique para QR CODE -->
             <div class="footer-card">
-                <div class="badge-digital">
+                <div class="badge-digital" id="qrButton">
                     <i class="fas fa-qrcode"></i> cartão digital
                 </div>
                 <div id="dataHora">
@@ -589,9 +697,21 @@
         </div>
     </div>
 
+    <!-- MODAL DO QR CODE (TELA CHEIA) -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-container">
+            <div class="qr-title">STI · Cartão Digital</div>
+            <div id="qrcode"></div>
+            <div class="qr-link">https://corp-sti.github.io/cart-o/</div>
+            <button class="qr-close" id="closeQrModal">
+                <i class="fas fa-times"></i> Fechar
+            </button>
+        </div>
+    </div>
+
     <script>
         (function() {
-            // WHATSAPP com conversão otimizada
+            // WHATSAPP
             const whatsappBtn = document.getElementById('btnWhatsapp');
             const telefone = '5541988083006';
             const msg = 'Olá! Acabei de ver o cartão digital da STI e gostaria de mais informações.';
@@ -600,7 +720,6 @@
             whatsappBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 window.open(linkZap, '_blank');
-                // feedback tátil premium
                 this.style.background = '#D4AF37';
                 this.style.borderColor = '#FFFFFF';
                 setTimeout(() => {
@@ -609,7 +728,7 @@
                 }, 200);
             });
 
-            // Data/hora com ícone de relógio
+            // Data/hora
             const elData = document.getElementById('dataHora');
             const elSpan = elData.querySelector('span');
             
@@ -629,7 +748,7 @@
             atualizarHora();
             setInterval(atualizarHora, 1000);
 
-            // Saudação dinâmica com ícone correspondente
+            // Saudação dinâmica
             const saudacaoChip = document.getElementById('saudacaoChip');
             const hora = new Date().getHours();
             let periodo = '', icone = '';
@@ -648,6 +767,46 @@
             if (saudacaoChip) {
                 saudacaoChip.innerHTML = `<i class="fas ${icone}"></i> ${periodo}`;
             }
+
+            // QR CODE MODAL
+            const qrButton = document.getElementById('qrButton');
+            const qrModal = document.getElementById('qrModal');
+            const closeBtn = document.getElementById('closeQrModal');
+            const qrContainer = document.getElementById('qrcode');
+            
+            // URL do cartão digital
+            const qrUrl = 'https://corp-sti.github.io/cart-o/';
+            
+            // Gerar QR Code ao abrir o modal
+            qrButton.addEventListener('click', function() {
+                // Limpa o container anterior
+                qrContainer.innerHTML = '';
+                
+                // Cria novo QR Code
+                new QRCode(qrContainer, {
+                    text: qrUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                // Mostra o modal
+                qrModal.classList.add('active');
+            });
+            
+            // Fechar modal
+            closeBtn.addEventListener('click', function() {
+                qrModal.classList.remove('active');
+            });
+            
+            // Fechar ao clicar fora do container
+            qrModal.addEventListener('click', function(e) {
+                if (e.target === qrModal) {
+                    qrModal.classList.remove('active');
+                }
+            });
         })();
     </script>
 </body>
