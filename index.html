@@ -539,15 +539,47 @@
             text-align: center;
         }
 
-        .qr-link {
-            font-size: 0.8rem;
-            color: #D4AF37;
-            background: #1C1C1E;
-            padding: 8px 16px;
+        .qr-link-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+            background: #F5F5F7;
             border-radius: 40px;
+            padding: 4px 4px 4px 16px;
+        }
+
+        .qr-link {
+            font-size: 0.75rem;
+            color: #1C1C1E;
             word-break: break-all;
-            text-align: center;
-            max-width: 100%;
+            text-align: left;
+            flex: 1;
+        }
+
+        .share-button {
+            background: #D4AF37;
+            color: #1C1C1E;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .share-button i {
+            font-size: 1.3rem;
+        }
+
+        .share-button:active {
+            transform: scale(0.9);
+            background: #c19b2e;
         }
 
         .qr-close {
@@ -702,7 +734,12 @@
         <div class="qr-container">
             <div class="qr-title">STI · Cartão Digital</div>
             <div id="qrcode"></div>
-            <div class="qr-link">https://corp-sti.github.io/cart-o/</div>
+            <div class="qr-link-container">
+                <div class="qr-link">https://corp-sti.github.io/cart-o/</div>
+                <button class="share-button" id="shareButton" title="Compartilhar link">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
             <button class="qr-close" id="closeQrModal">
                 <i class="fas fa-times"></i> Fechar
             </button>
@@ -772,6 +809,7 @@
             const qrButton = document.getElementById('qrButton');
             const qrModal = document.getElementById('qrModal');
             const closeBtn = document.getElementById('closeQrModal');
+            const shareBtn = document.getElementById('shareButton');
             const qrContainer = document.getElementById('qrcode');
             
             // URL do cartão digital
@@ -805,6 +843,27 @@
             qrModal.addEventListener('click', function(e) {
                 if (e.target === qrModal) {
                     qrModal.classList.remove('active');
+                }
+            });
+
+            // Função de compartilhamento
+            shareBtn.addEventListener('click', async function() {
+                const shareData = {
+                    title: 'STI · Cartão Digital',
+                    text: 'Confira o cartão digital da STI - Soluções Técnicas Integradas',
+                    url: qrUrl
+                };
+
+                try {
+                    if (navigator.share) {
+                        await navigator.share(shareData);
+                    } else {
+                        // Fallback para navegadores sem suporte a Web Share
+                        await navigator.clipboard.writeText(qrUrl);
+                        alert('Link copiado para a área de transferência!');
+                    }
+                } catch (err) {
+                    console.log('Erro ao compartilhar:', err);
                 }
             });
         })();
