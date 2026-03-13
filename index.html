@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>STI · Cartão Digital</title>
+    <!-- Font Awesome 6 (CDN) com todos os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #0A0C0E;
+            background: radial-gradient(circle at 30% 20%, #1C252F, #0A0F14 90%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 0;
+            position: relative;
+        }
+
+        /* overlay de brilho */
+        body::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* CARD PRINCIPAL - dimensões EXATAS iPhone 12-15 (390x844) */
+        .card-sti {
+            width: 390px;
+            height: 844px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 52px;
+            box-shadow: 
+                0 50px 100px -30px rgba(0, 0, 0, 0.8),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+                0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.4, 1), box-shadow 0.4s;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER com logo centralizada e MAIOR */
+        .header-logo {
+            padding: 24px 24px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            background: rgba(255,255,255,0.4);
+            height: auto;
+            min-height: auto;
+            flex-shrink: 0;
+        }
+
+        /* Container da logo com tamanho AINDA MAIOR */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 320px; /* Aumentado de 260px para 320px */
+            height: 85px; /* Aumentado de 65px para 85px */
+        }
+
+        /* Imagem da logo redimensionada proporcionalmente */
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
+        }
+
+        /* Badge premium ocultado */
+        .badge-header {
+            display: none;
+        }
+
+        /* conteúdo com scroll suave - MARGENS INTERNAS UNIFORMES */
+        .conteudo {
+            padding: 16px 24px 20px;
+            background: transparent;
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            display: flex;
+            flex-direction: column;
+        }
+        .conteudo::-webkit-scrollbar { display: none; }
+
+        /* tagline com glass refinado */
+        .tagline-wrapper {
+            background: rgba(250, 250, 252, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 10px 16px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 20px -16px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+        }
+
+        .tagline-principal {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #1C1C1E;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tagline-principal i {
+            color: #D4AF37;
+            font-size: 0.9rem;
+        }
+
+        .chip-saudacao {
+            background: #1C1C1E;
+            color: #FFFFFF;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid #2C2C2E;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .chip-saudacao i {
+            color: #D4AF37;
+        }
+
+        /* grid serviços 2x2 */
+        .servicos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 14px 0 14px;
+            flex-shrink: 0;
+        }
+
+        .servico-item {
+            background: rgba(250, 250, 252, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 18px 4px 12px;
+            text-align: center;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 20px -18px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .servico-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #D4AF37;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .servico-item:active {
+            transform: scale(0.97);
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #D4AF37;
+        }
+
+        .servico-item:active::before {
+            transform: scaleX(1);
+        }
+
+        .servico-item i {
+            font-size: 1.8rem;
+            color: #1C1C1E;
+            margin-bottom: 6px;
+            opacity: 0.85;
+            transition: all 0.25s;
+        }
+
+        .servico-item:active i {
+            color: #D4AF37;
+            transform: scale(1.03);
+        }
+
+        .servico-item .rotulo {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #1C1C1E;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* destaques elegantes */
+        .destaque-servicos {
+            background: rgba(28, 28, 30, 0.9);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            color: white;
+            padding: 14px 14px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin: 14px 0 16px;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            box-shadow: 0 15px 25px -18px #000;
+            flex-shrink: 0;
+        }
+
+        .destaque-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.55rem;
+            font-weight: 500;
+            color: #F5F5F7;
+        }
+
+        .destaque-item i {
+            color: #D4AF37;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        /* WHATSAPP - DESTAQUE MÁXIMO */
+        .contato-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 8px 0 10px;
+            flex-shrink: 0;
+        }
+
+        .whatsapp-bloco {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 12px 16px;
+            border-radius: 80px;
+            border: 1.5px solid #D4AF37;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 15px 30px -15px rgba(212, 175, 55, 0.4);
+        }
+
+        .whatsapp-bloco:active {
+            transform: scale(0.97);
+            background: #D4AF37;
+            border-color: #FFFFFF;
+        }
+
+        .whatsapp-bloco:active i,
+        .whatsapp-bloco:active .whatsapp-texto .principal,
+        .whatsapp-bloco:active .whatsapp-texto .secundario {
+            color: #1C1C1E;
+        }
+
+        .whatsapp-bloco i {
+            font-size: 2.2rem;
+            color: #D4AF37;
+            transition: color 0.2s;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .whatsapp-texto {
+            flex: 1;
+        }
+
+        .whatsapp-texto .principal {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1C1C1E;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .principal-badge-gold {
+            background: #D4AF37;
+            color: #1C1C1E;
+            padding: 3px 8px;
+            border-radius: 40px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .whatsapp-texto .secundario {
+            font-size: 0.7rem;
+            color: #3A3A3C;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 3px;
+        }
+
+        .whatsapp-texto .secundario i {
+            font-size: 0.7rem;
+            color: #D4AF37;
+        }
+
+        /* endereço e site */
+        .contato-secundario {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .contato-bloco {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(250, 250, 252, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 10px 14px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .contato-bloco:active {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: #D4AF37;
+            transform: scale(0.98);
+        }
+
+        .contato-bloco i {
+            font-size: 1.3rem;
+            color: #3A3A3C;
+            min-width: 1.6rem;
+            text-align: center;
+        }
+
+        .contato-conteudo .principal {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1C1C1E;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .principal-badge {
+            background: #1C1C1E;
+            color: #FFFFFF;
+            padding: 2px 6px;
+            border-radius: 30px;
+            font-size: 0.5rem;
+            font-weight: 600;
+        }
+
+        .contato-conteudo .secundario {
+            font-size: 0.6rem;
+            color: #6C6C70;
+            margin-top: 2px;
+        }
+
+        .site-bloco {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(212, 175, 55, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 8px 14px;
+            border-radius: 60px;
+            border: 1px dashed rgba(212, 175, 55, 0.4);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .site-bloco:active {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: #D4AF37;
+        }
+
+        .site-bloco i {
+            font-size: 1.3rem;
+            color: #3A3A3C;
+        }
+
+        .site-texto {
+            font-weight: 500;
+            font-size: 0.75rem;
+            color: #1C1C1E;
+        }
+
+        .site-texto small {
+            display: block;
+            font-size: 0.55rem;
+            color: #8E8E93;
+            margin-top: 2px;
+        }
+
+        /* rodapé */
+        .footer-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(0,0,0,0.04);
+            padding-top: 12px;
+            margin-top: 8px;
+            font-size: 0.65rem;
+            color: #8E8E93;
+            flex-shrink: 0;
+        }
+
+        .badge-digital {
+            background: rgba(0,0,0,0.02);
+            padding: 4px 12px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid rgba(0,0,0,0.04);
+            backdrop-filter: blur(8px);
+        }
+
+        .badge-digital i {
+            color: #D4AF37;
+        }
+
+        #dataHora {
+            background: rgba(0,0,0,0.02);
+            padding: 4px 12px;
+            border-radius: 60px;
+            border: 1px solid rgba(0,0,0,0.04);
+            font-family: 'Inter', monospace;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-sti">
+        <!-- HEADER COM LOGO CENTRALIZADA E AINDA MAIOR -->
+        <div class="header-logo">
+            <div class="logo-container">
+                <img src="https://i.ibb.co/8wFNWHR/STI-1.png"
+                     alt="STI Soluções Técnicas Integradas"
+                     class="logo-img"
+                     title="STI · Soluções Técnicas Integradas"
+                     loading="lazy"
+                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'320\' height=\'85\' viewBox=\'0 0 320 85\'%3E%3Crect width=\'320\' height=\'85\' fill=\'%23003459\' rx=\'12\'/%3E%3Ctext x=\'40\' y=\'55\' font-family=\'Arial\' font-size=\'34\' font-weight=\'bold\' fill=\'%23D4AF37\'%3ESTI%3C/text%3E%3Ctext x=\'40\' y=\'72\' font-family=\'Arial\' font-size=\'14\' fill=\'%23FFFFFF\'%3ESOLUÇÕES TÉCNICAS INTEGRADAS%3C/text%3E%3C/svg%3E'">
+            </div>
+            <!-- Badge premium ocultado -->
+        </div>
+
+        <div class="conteudo">
+            <!-- tagline com ícone de lâmpada e saudação com ícone dinâmico -->
+            <div class="tagline-wrapper">
+                <div class="tagline-principal">
+                    <i class="fas fa-lightbulb"></i> Inovação & Tecnologia
+                </div>
+                <div class="chip-saudacao" id="saudacaoChip">
+                    <i class="fas fa-moon"></i> boa noite
+                </div>
+            </div>
+
+            <!-- serviços grid com ícones: rede, shield (segurança eletrônica), chip, raio -->
+            <div class="servicos-grid">
+                <div class="servico-item" title="Redes estruturadas · Wi-Fi 6 · Fibra">
+                    <i class="fas fa-network-wired"></i>
+                    <div class="rotulo">REDES & INFRA</div>
+                </div>
+                <div class="servico-item" title="CFTV 4K · Alarmes · Biometria · Segurança eletrônica">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="rotulo">SEG. ELETRÔNICA</div>
+                </div>
+                <div class="servico-item" title="Suporte TI · Cloud · Segurança digital">
+                    <i class="fas fa-microchip"></i>
+                    <div class="rotulo">TI & SUPORTE</div>
+                </div>
+                <div class="servico-item" title="Projetos elétricos · Automação">
+                    <i class="fas fa-bolt"></i>
+                    <div class="rotulo">ELÉTRICA TÉCN.</div>
+                </div>
+            </div>
+
+            <!-- destaques com ícones: ferramentas, sincronizar, headset -->
+            <div class="destaque-servicos">
+                <div class="destaque-item">
+                    <i class="fas fa-tools"></i>
+                    <span>INSTALAÇÃO</span>
+                </div>
+                <div class="destaque-item">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>MANUTENÇÃO</span>
+                </div>
+                <div class="destaque-item">
+                    <i class="fas fa-headset"></i>
+                    <span>SUPORTE 24H</span>
+                </div>
+            </div>
+
+            <!-- CONTATO COM FOCO NO WHATSAPP -->
+            <div class="contato-wrapper">
+                <!-- BOTÃO WHATSAPP PRINCIPAL com ícone do whatsapp -->
+                <div class="whatsapp-bloco" id="btnWhatsapp" title="Falar agora no WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                    <div class="whatsapp-texto">
+                        <div class="principal">
+                            (41) 98808-3006
+                            <span class="principal-badge-gold">WHATSAPP</span>
+                        </div>
+                        <div class="secundario">
+                            <i class="fas fa-bolt"></i> resposta em até 3min
+                        </div>
+                    </div>
+                </div>
+
+                <!-- endereço com ícone de mapa e site com ícone de globo -->
+                <div class="contato-secundario">
+                    <div class="contato-bloco" title="Ver no mapa" onclick="window.open('https://maps.google.com/?q=Rua+Eloy+de+Assis+Fabris+452+Curitiba', '_blank')">
+                        <i class="fas fa-map-pin"></i>
+                        <div class="contato-conteudo">
+                            <div class="principal">
+                                Rua Eloy de Assis Fabris, 452
+                                <span class="principal-badge">LOJA 04</span>
+                            </div>
+                            <div class="secundario">Novo Mundo, Curitiba · PR</div>
+                        </div>
+                    </div>
+
+                    <div class="site-bloco" title="Site oficial" onclick="window.open('https://corp-sti.github.io/br/', '_blank')">
+                        <i class="fas fa-globe"></i>
+                        <div class="site-texto">
+                            corp-sti.github.io/br
+                            <small>portfólio · cases</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- rodapé com ícone de qrcode e relógio -->
+            <div class="footer-card">
+                <div class="badge-digital">
+                    <i class="fas fa-qrcode"></i> cartão digital
+                </div>
+                <div id="dataHora">
+                    <i class="far fa-clock"></i> <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // WHATSAPP com conversão otimizada
+            const whatsappBtn = document.getElementById('btnWhatsapp');
+            const telefone = '5541988083006';
+            const msg = 'Olá! Acabei de ver o cartão digital da STI e gostaria de mais informações.';
+            const linkZap = `https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`;
+
+            whatsappBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                window.open(linkZap, '_blank');
+                // feedback tátil premium
+                this.style.background = '#D4AF37';
+                this.style.borderColor = '#FFFFFF';
+                setTimeout(() => {
+                    this.style.background = '';
+                    this.style.borderColor = '';
+                }, 200);
+            });
+
+            // Data/hora com ícone de relógio
+            const elData = document.getElementById('dataHora');
+            const elSpan = elData.querySelector('span');
+            
+            function atualizarHora() {
+                const agora = new Date();
+                const opcoes = {
+                    timeZone: 'America/Sao_Paulo',
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false
+                };
+                const horaBR = new Intl.DateTimeFormat('pt-BR', opcoes).format(agora);
+                if (elSpan) {
+                    elSpan.textContent = horaBR;
+                }
+            }
+            atualizarHora();
+            setInterval(atualizarHora, 1000);
+
+            // Saudação dinâmica com ícone correspondente
+            const saudacaoChip = document.getElementById('saudacaoChip');
+            const hora = new Date().getHours();
+            let periodo = '', icone = '';
+            
+            if (hora < 12) { 
+                periodo = 'bom dia'; 
+                icone = 'fa-sun'; 
+            } else if (hora < 18) { 
+                periodo = 'boa tarde'; 
+                icone = 'fa-cloud-sun'; 
+            } else { 
+                periodo = 'boa noite'; 
+                icone = 'fa-moon'; 
+            }
+            
+            if (saudacaoChip) {
+                saudacaoChip.innerHTML = `<i class="fas ${icone}"></i> ${periodo}`;
+            }
+        })();
+    </script>
+</body>
+</html>
